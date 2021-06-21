@@ -1,4 +1,3 @@
-
 const declareDico = () => {
   window.dico = [
     'abaissement',

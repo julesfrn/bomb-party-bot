@@ -1,20 +1,41 @@
 const main = () => {
+  setInterval(() => {
+    console.log('script injected and running')
+  }, 1000)
+
   let dico = window.dico
+
   const answerIfSelfTurn = (mutationList) => {
-    mutationList.forEach(() => {
-      if (
-        !document.querySelector('.selfTurn').attributes.hidden &&
-        !document.querySelector('.round').attributes.hidden
-      ) {
-        const syllabe = document.querySelector('.syllable').innerText
-        const correctWord = dico.find(word => word.includes(syllabe.toLowerCase()))
-        dico = dico.filter(word => word !== correctWord)
-        document.querySelector('.selfTurn form input').value = correctWord
-        setTimeout(() => {
-          document.querySelector('.selfTurn form').dispatchEvent(new SubmitEvent('submit'))
-        }, 250)
-      }
-    })
+    setTimeout(() => {
+      mutationList.forEach(async () => {
+        if (
+          !document.querySelector('.selfTurn').attributes.hidden &&
+          !document.querySelector('.round').attributes.hidden
+        ) {
+          const syllabe = document.querySelector('.syllable').innerText
+          const possibleWords = dico.filter((word) =>
+            word.includes(syllabe.toLowerCase())
+          )
+          const correctWord =
+            possibleWords[Math.floor(Math.random() * possibleWords.length)]
+          dico = dico.filter((word) => word !== correctWord)
+          correctWord.split('').forEach((letter, i) => {
+            setTimeout(() => {
+              const inputEvent = new Event('input')
+              document.querySelector('.selfTurn form input').value += letter
+              document
+                .querySelector('.selfTurn form input')
+                .dispatchEvent(inputEvent)
+            }, i * 100)
+          })
+          setTimeout(() => {
+            document
+              .querySelector('.selfTurn form')
+              .dispatchEvent(new SubmitEvent('submit'))
+          }, correctWord.length * 100 + 50)
+        }
+      })
+    }, 500 + Math.random() * 1000)
   }
 
   const observerOnRound = new MutationObserver(answerIfSelfTurn)
