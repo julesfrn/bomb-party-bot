@@ -4,35 +4,34 @@ const main = () => {
   }, 1000)
 
   let dico = window.dico
-
+  const answer = () => {
+    const syllabe = document.querySelector('.syllable').innerText
+    const possibleWords = dico.filter((word) => word.includes(syllabe.toLowerCase()))
+    const correctWord = possibleWords[Math.floor(Math.random() * possibleWords.length)]
+    dico = dico.filter((word) => word !== correctWord)
+    correctWord.split('').forEach((letter, i) => {
+      setTimeout(() => {
+        const inputEvent = new Event('input')
+        document.querySelector('.selfTurn form input').value += letter
+        document.querySelector('.selfTurn form input').dispatchEvent(inputEvent)
+      }, i * 100)
+    })
+    setTimeout(() => {
+      document.querySelector('.selfTurn form').dispatchEvent(new SubmitEvent('submit'))
+    }, correctWord.length * 100 + 50)
+    setTimeout(() => {
+      if (!document.querySelector('.selfTurn').attributes.hidden && !document.querySelector('.round').attributes.hidden)
+        answer()
+    }, correctWord.length * 100 + 100)
+  }
   const answerIfSelfTurn = (mutationList) => {
     setTimeout(() => {
-      mutationList.forEach(async () => {
+      mutationList.forEach(() => {
         if (
           !document.querySelector('.selfTurn').attributes.hidden &&
           !document.querySelector('.round').attributes.hidden
         ) {
-          const syllabe = document.querySelector('.syllable').innerText
-          const possibleWords = dico.filter((word) =>
-            word.includes(syllabe.toLowerCase())
-          )
-          const correctWord =
-            possibleWords[Math.floor(Math.random() * possibleWords.length)]
-          dico = dico.filter((word) => word !== correctWord)
-          correctWord.split('').forEach((letter, i) => {
-            setTimeout(() => {
-              const inputEvent = new Event('input')
-              document.querySelector('.selfTurn form input').value += letter
-              document
-                .querySelector('.selfTurn form input')
-                .dispatchEvent(inputEvent)
-            }, i * 100)
-          })
-          setTimeout(() => {
-            document
-              .querySelector('.selfTurn form')
-              .dispatchEvent(new SubmitEvent('submit'))
-          }, correctWord.length * 100 + 50)
+          answer()
         }
       })
     }, 500 + Math.random() * 1000)
